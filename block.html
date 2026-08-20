@@ -4,13 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="텍스트와 블록으로 하나의 AI 챗봇 프로젝트를 만드는 교육용 편집기" />
-    <title>CCFEPub v2 RC · Block Editor</title>
+    <title>CCFEPub v2 · Block Editor</title>
     <link rel="stylesheet" href="./style.css" />
     <script src="https://cdn.jsdelivr.net/npm/blockly/blockly.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/blockly/msg/ko.js"></script>
   </head>
   <body>
-    <header class="site-header"><a class="brand" href="./index.html" aria-label="CCFEPub 홈">CCFEPub <span>v2 release candidate</span></a><nav class="mode-tabs" aria-label="프로젝트 편집 모드"><a id="switchToText" href="./index.html">Text Editor</a><a class="active" href="./block.html" aria-current="page">Block Editor</a></nav></header>
+    <header class="site-header"><a class="brand" href="./index.html" aria-label="CCFEPub 홈">CCFEPub <span>v2.0</span></a><nav class="mode-tabs" aria-label="프로젝트 편집 모드"><a id="switchToText" href="./index.html">Text Editor</a><a class="active" href="./block.html" aria-current="page">Block Editor</a></nav></header>
     <main class="app-shell wide">
       <section class="intro" aria-labelledby="pageTitle"><p class="eyebrow">BUILD · INSPECT · TEST</p><h1 id="pageTitle">블록으로 같은 프로젝트를 이어서 편집하세요.</h1><p>블록을 조립하고 설정을 확인한 뒤, 실제 Test Chat으로 동작을 검증하세요.</p></section>
       <section class="api-bar" aria-labelledby="apiKeyTitle"><div><h2 id="apiKeyTitle">Gemini API Key</h2><p>키는 현재 세션에만 보관되며 project JSON에는 포함되지 않습니다.</p></div><div class="api-controls"><label class="sr-only" for="apiKey">Gemini API Key</label><input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="API key" /><button id="toggleApiKey" class="button secondary" type="button" aria-pressed="false">Show</button><button id="clearApiKey" class="button ghost" type="button">Clear</button></div></section>

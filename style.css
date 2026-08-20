@@ -137,7 +137,7 @@ input:focus, textarea:focus, button:focus-visible, a:focus-visible { outline: 3p
 }
 
 
-/* Release candidate product states */
+/* v2 product states */
 .project-identity { min-width: 0; display: grid !important; grid-template-columns: auto minmax(0, auto) auto; align-items: baseline; gap: 8px !important; }
 .project-identity > span { color: var(--accent); font-size: .66rem; font-weight: 800; letter-spacing: .1em; }
 .project-identity > strong { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

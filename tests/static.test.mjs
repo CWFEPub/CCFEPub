@@ -32,3 +32,23 @@ test("API key uses sessionStorage and never localStorage", async () => {
   assert.doesNotMatch(app, /localStorage/);
   assert.doesNotMatch(app, /console\.log/);
 });
+
+
+test("released v2 pages do not present themselves as a release candidate", async () => {
+  const sources = await Promise.all(
+    ["README.md", "index.html", "block.html"].map((file) => readFile(resolve(root, file), "utf8")),
+  );
+  assert.doesNotMatch(sources.join("\n"), /release candidate|v2 rc/i);
+});
+
+test("README example stays aligned with the shared product example", async () => {
+  const [readme, exampleModule] = await Promise.all([
+    readFile(resolve(root, "README.md"), "utf8"),
+    readFile(resolve(root, "examples.js"), "utf8"),
+  ]);
+  const source = exampleModule.split("\x60")[1];
+  assert.ok(source, "shared example source not found");
+  for (const command of source.split("\n")) {
+    assert.ok(readme.includes(command), `README is missing shared example command: ${command}`);
+  }
+});
