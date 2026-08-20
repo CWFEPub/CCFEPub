@@ -1,94 +1,119 @@
-# CCFEPub
-## Custom Chatbot For Education
-- [LLM, 챗봇 교육을 위한 프로젝트](https://github.com/CWFEPub/CCFEPub)
-- 간단한 명령어로 챗봇 페르소나 설정
-- GEMINI API 사용
+# CCFEPub v2 Release Candidate
 
-## 사용 방법
+CCFEPub(Custom Chatbot For Education)은 텍스트 명령어와 Blockly 블록으로 하나의 AI 챗봇 프로젝트를 만드는 교육용 웹 앱입니다. 별도 빌드 없이 정적 서버와 GitHub Pages에서 실행됩니다.
 
-1. [Google AI Studio](https://ai.google.dev/aistudio)에 접속합니다.
-2. "Get your API key"를 클릭하고 로그인합니다.
+## 첫 프로젝트 만들기
 
-   ![AI Studio](./img/AIstudio.png)
+1. **New Project**로 빈 프로젝트를 만들거나 **Load Example**로 전체 흐름을 불러옵니다.
+2. Text Editor에서 명령어를 작성하거나 Block Editor에서 블록을 조립합니다.
+3. **Project Inspector**에서 이름, 규칙, 지식, 안전 설정, 응답 길이를 확인합니다.
+4. Gemini API 키를 입력하고 **Run**을 눌러 Test Chat을 시작합니다.
+5. 프로젝트를 변경했다면 `Configuration changed. Run again` 안내에 따라 다시 Run합니다.
 
-3. 로그인 후, 왼쪽 메뉴에서 **Dashboard** > **Projects**를 클릭하여 프로젝트 페이지로 이동합니다.
+API 키는 새 프로젝트·예제 불러오기·Clear Chat에도 유지됩니다. **Clear API Key**를 누르거나 키 값을 변경하면 활성 Test Chat은 즉시 무효화됩니다.
 
-   ![Dashboard](./img/dashboard.png)
-   ![Projects](./img/projects.png)
+## 기본 예제
 
-4. **새 프로젝트 만들기** 버튼을 클릭하여 새로운 프로젝트를 생성합니다.
+기본 학습 도우미 예제는 프로젝트의 대표 기능을 한 번에 보여 줍니다.
 
-   ![New Project](./img/newProject.png)
+```text
+setName("학습 도우미")
+setRole("질문을 차근차근 설명하는 학습 파트너")
+whenUserSays("안녕").reply("안녕하세요! 오늘은 무엇을 공부할까요?")
+whenUserIncludes("힌트").reply("좋아요. 정답 대신 첫 단서부터 함께 찾아볼게요.")
+addKnowledge("공부 방법", "큰 문제를 작은 단계로 나누고 한 단계씩 확인해요.")
+blockPersonalInfo()
+blockSensitiveTopics(["폭력", "성적인 내용"])
+safeReply("그 주제 대신 안전한 학습 주제로 이야기해 볼까요?")
+showSystemPrompt()
+startChatbot()
+```
 
-5. **API Keys**를 클릭하여 API 키 관리 페이지로 이동합니다.
+Text와 Blocks는 같은 canonical operation sequence를 편집합니다. 화면을 전환할 때 변환할 수 없는 명령이나 블록이 있으면 전환을 중단하고 마지막 유효 프로젝트를 보존합니다.
 
-   ![API Keys](./img/APIkey.png)
+## Test Chat 상태
 
-6. **API 키 만들기**를 클릭하여 새로운 API 키를 생성합니다. 생성 시, 이전에 만든 프로젝트를 선택합니다.
+런타임은 다음 상태를 사용자에게 명시적으로 표시합니다.
 
-   ![New API Key](./img/newAPIkey.png)
+- `Idle` — 편집 가능, Test Chat은 아직 시작하지 않음
+- `Validating` — 현재 프로젝트 설정 확인 중
+- `API key required` — API 키 입력 필요
+- `Starting` — Gemini SDK 및 세션 시작 중
+- `Ready` — 메시지 전송 가능
+- `Sending` — 응답 대기 중
+- `Configuration changed. Run again` — 편집 또는 API 키 변경으로 기존 세션 무효화
+- `Error` — SDK, 인증, 네트워크, 요청 한도 또는 요청 오류
 
-7. 생성된 API 키의 **키 부분**을 클릭하고, 키를 복사합니다.
+**Clear Chat**은 보이는 대화와 Gemini 대화 세션만 새로 만들며 프로젝트 설정과 API 키를 유지합니다. System prompt dialog에서는 생성된 prompt를 확인하고 복사할 수 있습니다.
 
-   ![My Key](./img/myKey.png)
+## Project format v1
 
-8. [CCFEPub](https://maruson08.github.io/CCFEPub/)에 접속하여, 처음 화면에 복사한 API 키를 붙여넣고 사용을 시작합니다.
+프로젝트의 source of truth는 순서를 보존하는 `operations`입니다.
 
-   ![CCFEPub](./img/ccfepub.png)
+```json
+{
+  "format": "ccfepub-project",
+  "formatVersion": 1,
+  "editorMode": "text",
+  "operations": [],
+  "metadata": {
+    "name": "AI 친구",
+    "createdAt": "...",
+    "updatedAt": "..."
+  }
+}
+```
 
-## Planned Features
+- 자동 저장: `localStorage`의 `ccfepub.project.v1`
+- API 키: 현재 탭의 `sessionStorage`에만 저장
+- Export: `<project-name>.ccfepub.json`; 이름이 없으면 `ccfepub-project.ccfepub.json`
+- Import: format, version, operations를 먼저 검증하며 실패 시 현재 프로젝트를 그대로 유지
+- Migration: 기존 `ccfepub.textCommands.v2`, `ccfepub.blocklyWorkspace.v2`를 가능한 경우 format v1으로 이전
 
-- 영어 버전 개발  
-  **ETA**: TBD
+API 키와 chat message는 project JSON에 포함되지 않습니다. 브라우저 기반 앱에서는 키를 완전히 숨길 수 없으므로 교육·개발용으로 제한된 키와 사용량 제한을 권장합니다.
 
-- 실제 챗봇 구조를 설계할 수 있는 명령어 추가 개발  
-  **ETA**: TBD
+## 로컬 실행
 
-- GUI 개발을 통해 사용자와의 상호작용을 가능하게 만들기  
-  **ETA**: TBD
+ES modules와 CDN 리소스를 위해 저장소 루트에서 정적 서버를 실행합니다.
 
-## Contributing
+```bash
+python -m http.server 8000
+```
 
-This project is **open source**, and we welcome contributions! Whether you're fixing bugs, adding new features, or improving documentation, feel free to contribute by following these steps:
+- Text Editor: `http://localhost:8000/`
+- Block Editor: `http://localhost:8000/block.html`
 
-### How to Contribute
+Gemini SDK와 Blockly는 실행 시 CDN 네트워크가 필요합니다. Gemini SDK가 차단되더라도 편집기와 Run 이벤트는 계속 동작하며 별도의 SDK 로드 오류를 표시합니다.
 
-1. **Fork the repository**  
-   - Click the "Fork" button at the top-right of the repository page to create a copy of this repository under your own GitHub account.
+## 구조
 
-2. **Clone the repository**  
-   - Clone your forked repository to your local machine:
-     ```bash
-     git clone https://github.com/maruson08/CCFEPub
-     ```
+- `engine.js` — parser, canonical operations, serializer, prompt
+- `project.js` — project format v1, validation, persistence, migration
+- `block_mapping.js` — canonical operation ↔ Blockly record
+- `examples.js` — Text/Blockly 공통 제품 예제
+- `project_ui.js` — Inspector, import/export, 파일명 처리
+- `app.js` — Gemini adapter, runtime lifecycle, API key, prompt, Test Chat
+- `script.js` / `blockly_script.js` — 편집기별 UI controller
 
-3. **Create a new branch**  
-   - It's a good practice to create a new branch for your changes:
-     ```bash
-     git checkout -b feature-name
-     ```
+## 검증
 
-4. **Make your changes**  
-   - Work on your changes in the new branch. Be sure to test thoroughly before submitting.
+의존성 설치 없이 전체 테스트를 실행합니다.
 
-5. **Commit your changes**  
-   - Once you're happy with your changes, commit them with a meaningful message:
-     ```bash
-     git commit -m "Add feature or fix bug"
-     ```
+```bash
+node --test
+```
 
-6. **Push your changes**  
-   - Push your changes to your forked repository:
-     ```bash
-     git push origin feature-name
-     ```
+테스트는 parser와 serializer, project schema, Text/Block round-trip, New Project, Load Example, dirty/stale runtime, API key invalidation, Clear Chat, import atomicity, export filename, SDK·Gemini 오류, storage failure, DOM wiring을 검증합니다.
 
-7. **Submit a Pull Request**  
-   - Go to the repository on GitHub and click "New Pull Request."
-   - Compare your changes with the `main` branch and submit the pull request (PR).
-   - Provide a detailed description of your changes and any additional context for reviewers.
+정적 검증:
 
+```bash
+node --check app.js
+node --check script.js
+node --check blockly_script.js
+git diff --check
+```
 
 ## License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for more details.
+Copyright (c) 2025 maruson08. MIT License로 배포됩니다. 자세한 내용은 [LICENSE](./LICENSE)를 참고하세요.
