@@ -11,7 +11,7 @@ for (const [page, controller, navId] of [
   ["index.html", "script.js", "switchToBlock"],
   ["block.html", "blockly_script.js", "switchToText"],
 ]) {
-  test(`${page} exposes and wires all release-candidate actions`, async () => {
+  test(`${page} exposes and wires all released v2 actions`, async () => {
     const [html, script] = await Promise.all([
       readFile(new URL(`../${page}`, import.meta.url), "utf8"),
       readFile(new URL(`../${controller}`, import.meta.url), "utf8"),

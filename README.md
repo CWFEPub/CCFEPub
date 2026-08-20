@@ -1,4 +1,4 @@
-# CCFEPub v2 Release Candidate
+# CCFEPub v2
 
 CCFEPub(Custom Chatbot For Education)은 텍스트 명령어와 Blockly 블록으로 하나의 AI 챗봇 프로젝트를 만드는 교육용 웹 앱입니다. 별도 빌드 없이 정적 서버와 GitHub Pages에서 실행됩니다.
 
@@ -19,12 +19,16 @@ API 키는 새 프로젝트·예제 불러오기·Clear Chat에도 유지됩니�
 ```text
 setName("학습 도우미")
 setRole("질문을 차근차근 설명하는 학습 파트너")
+setPersonality("친절하고 격려하는")
+setTone("명확하고 편안한 말투")
 whenUserSays("안녕").reply("안녕하세요! 오늘은 무엇을 공부할까요?")
 whenUserIncludes("힌트").reply("좋아요. 정답 대신 첫 단서부터 함께 찾아볼게요.")
 addKnowledge("공부 방법", "큰 문제를 작은 단계로 나누고 한 단계씩 확인해요.")
 blockPersonalInfo()
 blockSensitiveTopics(["폭력", "성적인 내용"])
 safeReply("그 주제 대신 안전한 학습 주제로 이야기해 볼까요?")
+limitLength(180)
+useEmoji(False)
 showSystemPrompt()
 startChatbot()
 ```
